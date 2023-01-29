@@ -34,7 +34,6 @@ function fetchTodaysWeather(searchQuery) {
     console.log(response);
     //Display todays weather
     renderCurrentWeather(response);
-    renderForecast();
   });
 }
 
@@ -45,11 +44,10 @@ function fetchWeatherForecast(searchQuery) {
   $.ajax({
     url: queryURL,
     method: "GET"
-  }).then(function (response) {
+  }).then(response => {
     console.log(formatData(response));
     //Get all required data from the response
-    const data = formatData(response);
-    //Display todays weather
+    const data = formatData(response); 
     renderForecast(data);
   });
 }
@@ -59,16 +57,20 @@ function renderCurrentWeather(response) {
   //Clear block from previous info
   $('#today').empty();
 
-  //Create elements, get all required details from response and add to relevant element
-  const title = $('<h2>').text(`${response.name}  (${new Date().toLocaleDateString()})`);
-  const temperature = $('<p>').text(`Temp: ${(response.main.temp - 273.15).toFixed(2)} °C`);
-  const humidity = $('<p>').text(`Humidity: ${response.main.humidity} %`);
-  const wind = $('<p>').text(`Temp: ${response.wind.speed} /KPH`);
-
-  const card = $('<div>').attr('class', 'card p-3');
-  card.append(title, temperature, humidity, wind)
+  //Create html for todays weather block
+  const weatherBlock = `
+  <div class='card p-3'>
+  <div>
+  <h2 class='day-title'>${response.name}  (${new Date().toLocaleDateString()})</h2>
+  <img src='https://openweathermap.org/img/wn/${response.weather[0].icon}@2x.png' alt='weather icon'/>
+  </div>
+  <p>Temp: ${(response.main.temp - 273.15).toFixed(2)} °C </p>
+  <p>Humidity: ${response.main.humidity} %</p>
+  <p>Wind: ${response.wind.speed} /KPH</p>
+  </div>
+  `
   //append all cretaed elements to "today weather" block
-  $('#today').append(card);
+  $('#today').append(weatherBlock);
 }
 
 
@@ -84,8 +86,8 @@ function renderForecast(data) {
     return `<div class='card bg-dark mr-3 col-sm-4 col-md-2 forecast-card'>
   <h5>${day.date}</>
   <img  src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
+  <p>Temp: ${day.maxTemp} °C</p>
   <p>Humidity: ${day.maxHumidity}</p>
-  <p>Temp: ${day.maxTemp}</p>
   <p>Wind: ${day.maxWind} KPH</p>
   </div>`
   }
