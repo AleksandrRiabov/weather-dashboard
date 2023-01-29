@@ -1,7 +1,8 @@
+const API_KEY = '7934ac155857010eeb74ee09abd772be';
+
 //Later need to get from localStorage
 let searchHistory = ['London', 'Paris', 'Berlin'];
 renderHistoryTownBtns()
-const API_KEY = '7934ac155857010eeb74ee09abd772be';
 
 //On form submit run this code 
 $('#search-form').on('submit', function (e) {
@@ -45,9 +46,9 @@ function fetchWeatherForecast(searchQuery) {
     url: queryURL,
     method: "GET"
   }).then(response => {
-    console.log(formatData(response));
+    console.log(formatData(response.list));
     //Get all required data from the response
-    const data = formatData(response); 
+    const data = formatData(response.list);
     renderForecast(data);
   });
 }
@@ -83,12 +84,12 @@ function renderForecast(data) {
     .text('5-Day Frorecast: '));
 
   function createSingleDayCard(day) {
-    return `<div class='card bg-dark mr-3 col-sm-4 col-md-2 forecast-card'>
+    return `<div class='card  col-sm-4 col-md-2 forecast-card'>
   <h5>${day.date}</>
   <img  src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
-  <p>Temp: ${day.maxTemp} °C</p>
+  <p>Temp: ${(day.maxTemp - 273.15).toFixed(1)} °C</p>
   <p>Humidity: ${day.maxHumidity}</p>
-  <p>Wind: ${day.maxWind} KPH</p>
+  <p>Wind: ${day.maxWind} <span>KPH</span></p>
   </div>`
   }
 
@@ -110,46 +111,55 @@ function createHistoryBtn(town) {
   const newTownBtn = $('<button>')
     .text(town)
     .attr('data-town', town)
-    .attr('class', 'btn btn-secondary mb-3');
+    .attr('class', 'btn btn-secondary mb-3 history-btn');
 
   $('#history').append(newTownBtn);
 }
 
+//Add event listener to history btns
+$('#history').on('click', '.history-btn', function () {
+  console.log('clicked');
+  const searchQuery = $(this).attr('data-town');
+  fetchTodaysWeather(searchQuery);
+  fetchWeatherForecast(searchQuery);
+})
 
-//Get Max numbers for each day.Max Temperature, Max Wind, Max Humidity.
-function formatData(response) {
-  //Split response array by single days. 
-  //ChankSize is equal to 8 because each element in response array represents 3hours. 3*8 = 24 (1day)
-  const splitedByDay = splitArray(response.list, 8);
+//Function to format response array. Takes array and returns array with required data
+function formatData(list) {
+  //Create an empty obj for formated data
+  const data = {};
 
-  return splitedByDay.map(day => {
-    //get the max numbers of the day
-    let maxTemperature = -Infinity;
-    let maxWind = -Infinity;
-    let maxHumidity = - Infinity;
-    //loop over the day find the max values and assign to the variables above.
-    day.forEach(threeHours => {
-      if (maxTemperature < threeHours.main.temp_max) maxTemperature = threeHours.main.temp_max;
-      if (maxWind < threeHours.wind.speed) maxWind = threeHours.wind.speed;
-      if (maxHumidity < threeHours.main.humidity) maxHumidity = threeHours.main.humidity;
-    });
+  //loop over the response and get required data such as(maxTemp, maxHumidity, maxWind..) into the 'data' obj 
+  for (let i = 0; i < list.length; i++) {
+    //Get date from response
+    const date = list[i].dt_txt.slice(0, 10).replace(/-/g, '/');
 
-    //Create and return the obj with required data for a single day
-    return {
-      date: (day[0].dt_txt).slice(0, 10),
-      icon: day[5].weather[0].icon,
-      maxTemp: (maxTemperature - 273.15).toFixed(2),
-      maxWind,
-      maxHumidity
+    //If date is not exist in data obj, create day details obj
+    if (!data[date]) {
+      data[date] = {
+        maxTemp: list[i].main.temp_max,
+        maxHumidity: list[i].main.humidity,
+        maxWind: list[i].wind.speed,
+        icon: '',
+        date
+      }
     }
-  });
 
-  //Function to split array to smaller chanks. Returns array of arrays
-  function splitArray(arr, chankSize) {
-    const splitedArr = []
-    for (let i = 0; i < arr.length; i += chankSize) {
-      splitedArr.push(arr.slice(i, i + chankSize));
-    }
-    return splitedArr;
+    //GET MAXIMUMS FOR THE DAY
+    //If value in data obj is less then value in 'response.list' add the biggest value to the 'data' obj
+    data[date].maxTemp = data[date].maxTemp < list[i].main.temp_max ? list[i].main.temp_max : data[date].maxTemp;
+    data[date].maxHumidity = data[date].maxHumidity < list[i].main.humidity ? list[i].main.humidity : data[date].maxHumidity;
+    data[date].maxWind = data[date].maxWind < list[i].wind.speed ? list[i].wind.speed : data[date].maxWind;
+
+    //Get time from current 3h block
+    const time = parseInt(list[i].dt_txt.slice(11, 13));
+    //If time equals to 12 get the icon
+    if (time === 12) data[date].icon = list[i].weather[0].icon;
+    //If time is already after 12 get first available icon
+    if (!data[date].icon && time > 12) data[date].icon = list[i].weather[0].icon;
   }
+
+  //Make an array and return
+  return Object.values(data);
 }
+

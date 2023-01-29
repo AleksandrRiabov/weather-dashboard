@@ -1,4 +1,15 @@
+
+
 .forecast-card {
   color: #fff;
+  font-size: 1rem;
+  background-color: #007bff;
 }
 
+.forecast-card span {
+  font-size: 0.8rem;
+}
+
+.day-title {
+  display: inline;
+}
