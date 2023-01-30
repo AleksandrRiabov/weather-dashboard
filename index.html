@@ -13,12 +13,12 @@
 </head>
 
 <body>
-  <header class="container-fluid text-center text-white bg-dark p-2 weather-header">
+  <header class="container-fluid text-center text-white p-2 weather-header">
     <h1>Weather Dashboard</h1>
   </header>
 
   <!-- max-width for ultra wide resolutions -->
-  <div class="container-fluid" style="max-width: 1400px">
+  <div id='main' class="container-fluid" style="max-width: 1400px">
     <div class="row">
       <aside class="col-lg-3 pb-3">
         <h2 id="form-heading" class="mt-1 h3 form-label">
@@ -29,7 +29,7 @@
             <div class="input-group">
               <input class="form-input weather-search" type="text" id="search-input" placeholder="London"
                 aria-labelledby="form-heading" aria-controls="today forecast" />
-              <div class="input-group-append">
+              <div class="input-group">
                 <button type="submit" class="btn search-button btn-primary" id="search-button" aria-label="submit search">
                   Search
                 </button>

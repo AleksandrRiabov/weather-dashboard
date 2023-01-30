@@ -25,6 +25,8 @@ $('#search-form').on('submit', function (e) {
 
 //Function to fetch wheater details 
 function fetchTodaysWeather(searchQuery) {
+  const loading = `<div id='loading'> Loading... </div>`;
+  $('body').append(loading);
   const queryURL =
     `https://api.openweathermap.org/data/2.5/weather?q=${searchQuery}&appid=${API_KEY}`
   //Fetch weather data from API
@@ -32,10 +34,10 @@ function fetchTodaysWeather(searchQuery) {
     url: queryURL,
     method: "GET"
   }).then(function (response) {
-    console.log(response);
+    $('#loading').remove();
     //Display todays weather
     renderCurrentWeather(response);
-  });
+  }).catch(err => console.log(err.statusText))
 }
 
 function fetchWeatherForecast(searchQuery) {
@@ -46,11 +48,13 @@ function fetchWeatherForecast(searchQuery) {
     url: queryURL,
     method: "GET"
   }).then(response => {
-    console.log(formatData(response.list));
     //Get all required data from the response
     const data = formatData(response.list);
     renderForecast(data);
-  });
+  }).catch(err => {
+    const messaage = `${err.status} City ${err.statusText}`
+    showModal(messaage)
+  })
 }
 
 //Function to render current weather info block
@@ -87,7 +91,7 @@ function renderForecast(data) {
     return `<div class='card  col-sm-4 col-md-2 forecast-card'>
   <h5>${day.date}</>
   <img  src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
-  <p>Temp: ${(day.maxTemp - 273.15).toFixed(1)} °C</p>
+  <p>Temp: ${Math.round(day.maxTemp - 273.15)} °C</p>
   <p>Humidity: ${day.maxHumidity}</p>
   <p>Wind: ${day.maxWind} <span>KPH</span></p>
   </div>`
@@ -118,7 +122,6 @@ function createHistoryBtn(town) {
 
 //Add event listener to history btns
 $('#history').on('click', '.history-btn', function () {
-  console.log('clicked');
   const searchQuery = $(this).attr('data-town');
   fetchTodaysWeather(searchQuery);
   fetchWeatherForecast(searchQuery);
@@ -160,6 +163,27 @@ function formatData(list) {
   }
 
   //Make an array and return
-  return Object.values(data);
+  return (Object.values(data)).slice(0, 5);
 }
 
+//Show Modal
+function showModal(messaage) {
+  const modal = `
+  <div id='modal'>
+  <div id='modalInner' class='modal-inner'>
+  ${messaage}
+  <div class='close-icon'>X</div>
+  </div>
+  </div>`
+
+  $('body').append(modal);
+
+  $('#modal').on('click', function (e) {
+    //If clicked on modalInner ignore, otherwise close modal
+    if ($(e.target).attr('id') !== 'modalInner') {
+      $('#modal').remove()
+    }
+  })
+}
+
+showModal('Welcome to Weather Dashboard! Please insert location!');
