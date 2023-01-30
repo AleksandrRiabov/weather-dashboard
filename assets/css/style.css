@@ -5,6 +5,14 @@
       rgba(2, 0, 36, 1) 99%)
 }
 
+#today,
+#forecast {
+  position: relative;
+  min-height: 150px;
+}
+
+
+
 .forecast-card {
   color: #fff;
   font-size: 1rem;
@@ -25,7 +33,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: rgba(0,0,0, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,16 +41,16 @@
 }
 
 .modal-inner {
- position: relative;
+  position: relative;
   padding: 30px;
-  background-color: rgb(255,255,255);
+  background-color: rgb(255, 255, 255);
   z-index: 1001;
   border-radius: 5px;
 }
 
-.close-icon{
+.close-icon {
   position: absolute;
-  right:-10px;
+  right: -10px;
   top: -17px;
   color: red;
   padding: 5px;
@@ -60,6 +68,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  color: #000 ;
+  color: #000;
   font-size: 2rem;
+  background-color: rgba(255, 255, 255, 0.3);
 }
