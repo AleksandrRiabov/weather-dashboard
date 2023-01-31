@@ -31,7 +31,6 @@ export async function fetchWeatherForecast(searchQuery) {
 
 
 
-
 //Function to format response array. Takes array and returns array with required data
 function formatData(list) {
   //Create an empty obj for formated data
@@ -67,6 +66,6 @@ function formatData(list) {
     if (!data[date].icon && time > 12) data[date].icon = list[i].weather[0].icon;
   }
 
-  //Make an array and return
+  //Make an array from object, remove 6th day and return.
   return (Object.values(data)).slice(0, 5);
 }
