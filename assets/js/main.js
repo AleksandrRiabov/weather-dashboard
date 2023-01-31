@@ -4,7 +4,10 @@ import showModal from "./modal.js";
 //Array to keap truck of search history
 let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
+//Simple loading component
 const loading = `<div id='loading'> Loading... Please wait.</div>`;
+
+//Run the function to generate history btns if there any history
 renderHistoryTownBtns();
 
 //On form submit run this code 
@@ -23,6 +26,7 @@ $('#search-form').on('submit', function (e) {
   $('#search-input').val('');
 });
 
+///////////////// Request Functions
 
 //Function to fetch and render wheater details 
 async function generateTodaysWeather(searchQuery) {
@@ -44,9 +48,9 @@ async function generateTodaysWeather(searchQuery) {
   } catch (error) {
     //If error, show modal window with the error message
     showModal(`Request error: ${error.status} ${error.statusText}`);
+    $('#today').children('#loading').remove();
   }
 }
-
 
 //Function to fetch and render 5 days forecast
 async function generateWeatherForecast(searchQuery) {
@@ -61,6 +65,8 @@ async function generateWeatherForecast(searchQuery) {
 }
 
 
+////////// Render Functions
+
 //Function to render current weather info block
 function renderCurrentWeather(response) {
   //Clear block from previous info
@@ -69,19 +75,18 @@ function renderCurrentWeather(response) {
   //Create html for todays weather block
   const weatherBlock = `
   <div class='card p-3'>
-  <div>
-  <h2 class='day-title'>${response.name}  (${new Date().toLocaleDateString()})</h2>
-  <img src='https://openweathermap.org/img/wn/${response.weather[0].icon}@2x.png' alt='weather icon'/>
-  </div>
-  <p>Temp: ${(response.main.temp - 273.15).toFixed(2)} °C </p>
-  <p>Humidity: ${response.main.humidity} %</p>
-  <p>Wind: ${response.wind.speed} /KPH</p>
+    <div>
+      <h2 class='day-title'>${response.name}  (${new Date().toLocaleDateString()})</h2>
+      <img src='https://openweathermap.org/img/wn/${response.weather[0].icon}@2x.png' alt='weather icon'/>
+    </div>
+    <p>Temp: ${(response.main.temp - 273.15).toFixed(2)} °C </p>
+    <p>Humidity: ${response.main.humidity} %</p>
+    <p>Wind: ${response.wind.speed} /KPH</p>
   </div>
   `
   //append all cretaed elements to "today weather" block
   $('#today').append(weatherBlock);
 }
-
 
 //Function to render 5 days forecast info block
 function renderForecast(data) {
@@ -90,15 +95,16 @@ function renderForecast(data) {
   $('#forecast').append($('<h4>').text('5-Day Frorecast: '));
 
   function createSingleDayCard(day) {
-    return `<div class='card forecast-card'>
-  <h5>${day.date}</>
-  <div>
-  <img  src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
-  </div>
-  <p>Temp: ${Math.round(day.maxTemp - 273.15)} °C</p>
-  <p>Humidity: ${day.maxHumidity}</p>
-  <p>Wind: ${day.maxWind} <span>KPH</span></p>
-  </div>`
+    return `
+    <div class='card forecast-card'>
+      <h5>${day.date}</>
+      <div>
+         <img src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
+      </div>
+      <p>Temp: ${Math.round(day.maxTemp - 273.15)} °C</p>
+      <p>Humidity: ${day.maxHumidity}%</p>
+      <p>Wind: ${day.maxWind} <span>KPH</span></p>
+    </div>`
   }
   const cardsContainer = $('<div>').attr('class', 'cards-container')
 
@@ -107,6 +113,8 @@ function renderForecast(data) {
 }
 
 
+/////////////// History Buttons /////////
+
 //Create buttons for each town
 function renderHistoryTownBtns() {
   //Clear history block
@@ -114,7 +122,6 @@ function renderHistoryTownBtns() {
   //Create and append new buttons to history block 
   searchHistory.slice().reverse().forEach(town => createHistoryBtn(town));
 }
-
 
 //Function to create and render single btn 
 function createHistoryBtn(town) {
@@ -127,12 +134,12 @@ function createHistoryBtn(town) {
   $('#history').append(newTownBtn);
 }
 
-
 //Add event listener to history btns
 $('#history').on('click', '.history-btn', function () {
   const searchQuery = $(this).attr('data-town');
   generateTodaysWeather(searchQuery);
   generateWeatherForecast(searchQuery);
-})
+});
 
-// showModal('Welcome to Weather Dashboard! Please insert location!');
+
+showModal('Welcome to Weather Dashboard! Please insert location!');
