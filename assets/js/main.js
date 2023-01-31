@@ -16,13 +16,15 @@ $('#search-form').on('submit', function (e) {
   if (!searchQuery.trim()) return
 
   //Add new search query (town) to searchHistory array
-  generateTodaysWeather(searchQuery)
-  generateWeatherForecast(searchQuery)
+  generateTodaysWeather(searchQuery);
+  generateWeatherForecast(searchQuery);
 
+  //Clean input
   $('#search-input').val('');
 });
 
-//Function to fetch wheater details 
+
+//Function to fetch and render wheater details 
 async function generateTodaysWeather(searchQuery) {
   $('#today').append(loading);//Loading started message
   try {
@@ -40,12 +42,13 @@ async function generateTodaysWeather(searchQuery) {
     renderCurrentWeather(response);
     renderHistoryTownBtns();
   } catch (error) {
+    //If error, show modal window with the error message
     showModal(`Request error: ${error.status} ${error.statusText}`);
   }
 }
 
 
-//Function to fetch 5 days forecast
+//Function to fetch and render 5 days forecast
 async function generateWeatherForecast(searchQuery) {
   $('#forecast').append(loading);
   try {
@@ -84,21 +87,23 @@ function renderCurrentWeather(response) {
 function renderForecast(data) {
   $('#forecast').empty()
 
-  $('#forecast').append($('<h4>')
-    .attr('class', 'col-sm-12 pl-0')
-    .text('5-Day Frorecast: '));
+  $('#forecast').append($('<h4>').text('5-Day Frorecast: '));
 
   function createSingleDayCard(day) {
-    return `<div class='card  col-sm-4 col-md-2 forecast-card'>
+    return `<div class='card forecast-card'>
   <h5>${day.date}</>
+  <div>
   <img  src='https://openweathermap.org/img/wn/${day.icon}.png' alt='Wheather Icon'/>
+  </div>
   <p>Temp: ${Math.round(day.maxTemp - 273.15)} °C</p>
   <p>Humidity: ${day.maxHumidity}</p>
   <p>Wind: ${day.maxWind} <span>KPH</span></p>
   </div>`
   }
+  const cardsContainer = $('<div>').attr('class', 'cards-container')
 
-  data.forEach(day => $('#forecast').append(createSingleDayCard(day)));
+  data.forEach(day => $(cardsContainer).append(createSingleDayCard(day)));
+  $('#forecast').append(cardsContainer);
 }
 
 

@@ -9,14 +9,28 @@
 #forecast {
   position: relative;
   min-height: 150px;
+  flex-direction: column;
 }
 
-
+#forecast h4 {
+display: block;
+}
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+}
 
 .forecast-card {
+  flex: 1;
+  min-width: 136px;
   color: #fff;
-  font-size: 1rem;
-  background-color: #007bff;
+  background: linear-gradient(90deg, rgba(0,123,255,1) 42%, rgba(18,91,210,1) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 10px 0;
 }
 
 .forecast-card span {
