@@ -1,9 +1,11 @@
 import { fetchTodaysWeather, fetchWeatherForecast } from "./services.js";
 import showModal from "./modal.js";
+
+//Array to keap truck of search history
+let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
 const loading = `<div id='loading'> Loading... Please wait.</div>`;
-//Later need to get from localStorage
-let searchHistory = JSON.parse(localStorage.getItem('history')) || [];
-renderHistoryTownBtns()
+renderHistoryTownBtns();
 
 //On form submit run this code 
 $('#search-form').on('submit', function (e) {
@@ -31,6 +33,8 @@ async function generateTodaysWeather(searchQuery) {
       searchHistory = searchHistory.filter(town => town !== searchQuery);
     }
     if (response.name) searchHistory.push(searchQuery);
+    //Save to localStorage
+    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
 
     //Display todays weather
     renderCurrentWeather(response);
