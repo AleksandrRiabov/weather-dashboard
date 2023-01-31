@@ -17,4 +17,12 @@ export default function showModal(messaage) {
       $('#modal').remove()
     }
   })
+
+  document.body.addEventListener('keypress', removeModal);
+
+  //Also remove modal on if user press any key
+  function removeModal() {
+    $('#modal').remove();
+    document.body.removeEventListener('keypress', removeModal);
+  }
 }
